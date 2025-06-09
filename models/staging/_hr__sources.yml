@@ -1,0 +1,253 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Raw HR data tables loaded from CSV files in Snowflake"
+    database: hr_analytics
+    schema: raw
+    tables:
+      - name: contract_basis
+        description: "Contract basic information with employee details"
+        columns:
+          - name: contract_zip_code
+            description: "ZIP code of the contract location"
+            data_type: integer
+          - name: firm_id
+            description: "Firm identifier"
+            data_type: string
+            tests:
+              - not_null
+          - name: department_id
+            description: "Department identifier"
+            data_type: string
+            tests:
+              - not_null
+          - name: category_id
+            description: "Category identifier"
+            data_type: string
+            tests:
+              - not_null
+          - name: person_id
+            description: "Person identifier"
+            data_type: string
+            tests:
+              - not_null
+          - name: contract_start_date
+            description: "Contract start date in DD/MM/YYYY format"
+            data_type: string
+            tests:
+              - not_null
+          - name: contract_end_date
+            description: "Contract end date in DD/MM/YYYY format"
+            data_type: string
+          - name: company_start_date
+            description: "Company start date in DD/MM/YYYY format"
+            data_type: string
+          - name: birth_date
+            description: "Birth date in DD/MM/YYYY format"
+            data_type: string
+          - name: contract_termination_reason
+            description: "Reason for contract termination"
+            data_type: string
+          - name: gender
+            description: "Employee gender"
+            data_type: string
+          - name: nationality
+            description: "Employee nationality"
+            data_type: string
+          - name: contract_type
+            description: "Type of contract"
+            data_type: string
+
+      - name: work_plan
+        description: "Working time plan details for each contract"
+        columns:
+          - name: fdcp
+            description: "Concatenated identifier: Firm|Department|Category|Person"
+            data_type: string
+            tests:
+              - not_null
+              - unique
+          - name: valid_from
+            description: "Validity start date in DD/MM/YYYY format"
+            data_type: string
+            tests:
+              - not_null
+          - name: valid_to
+            description: "Validity end date in DD/MM/YYYY format"
+            data_type: string
+            tests:
+              - not_null
+          - name: working_days_per_week
+            description: "Number of working days per week"
+            data_type: string
+          - name: nace_code
+            description: "NACE (economic activity) code"
+            data_type: integer
+          - name: nace_description
+            description: "NACE code description"
+            data_type: string
+
+      - name: salary_statement
+        description: "Monthly salary statements by contract"
+        columns:
+          - name: fdcp
+            description: "Concatenated identifier: Firm|Department|Category|Person"
+            data_type: string
+            tests:
+              - not_null
+          - name: gross_salary
+            description: "Gross salary amount"
+            data_type: string
+          - name: net_salary
+            description: "Net salary amount (may contain commas as decimal separator)"
+            data_type: string
+          - name: gross_salary_108
+            description: "Gross salary with 108% calculation"
+            data_type: string
+          - name: period
+            description: "Salary period in DD/MM/YYYY format"
+            data_type: string
+            tests:
+              - not_null
+
+      - name: absences
+        description: "Monthly absence data by contract and absence type"
+        columns:
+          - name: firm_id
+            description: "Firm identifier"
+            data_type: number
+            tests:
+              - not_null
+          - name: department_id
+            description: "Department identifier"
+            data_type: number
+            tests:
+              - not_null
+          - name: category_id
+            description: "Category identifier"
+            data_type: number
+            tests:
+              - not_null
+          - name: person_id
+            description: "Person identifier"
+            data_type: number
+            tests:
+              - not_null
+          - name: year
+            description: "Year of the absence record"
+            data_type: number
+          - name: quarter
+            description: "Quarter of the absence record"
+            data_type: number
+          - name: month
+            description: "Month of the absence record"
+            data_type: number
+          - name: date
+            description: "Date of the absence record"
+            data_type: date
+          - name: period
+            description: "Period of the absence record"
+            data_type: date
+            tests:
+              - not_null
+          - name: qty_illness_days
+            description: "Quantity of illness days"
+            data_type: number
+          - name: qty_z0_days
+            description: "Quantity of Z0 absence days"
+            data_type: number
+          - name: qty_z1_days
+            description: "Quantity of Z1 absence days (Illness - 1st month)"
+            data_type: number
+          - name: qty_z2_days
+            description: "Quantity of Z2 absence days (Illness - 2nd-12th month)"
+            data_type: number
+          - name: qty_z3_days
+            description: "Quantity of Z3 absence days (Illness - After 1 year)"
+            data_type: number
+          - name: qty_p0_days
+            description: "Quantity of P0 absence days"
+            data_type: number
+          - name: qty_p1_days
+            description: "Quantity of P1 absence days (Accident - 1st month)"
+            data_type: number
+          - name: qty_p2_days
+            description: "Quantity of P2 absence days (Accident - 2nd-12th month)"
+            data_type: number
+          - name: qty_p3_days
+            description: "Quantity of P3 absence days (Accident - After 1 year)"
+            data_type: number
+          - name: qty_a1_days
+            description: "Quantity of A1 absence days (Work Accident - 1st month)"
+            data_type: number
+          - name: qty_a2_days
+            description: "Quantity of A2 absence days (Work Accident - After 1st month)"
+            data_type: number
+          - name: freq_z0_days
+            description: "Frequency of Z0 absences"
+            data_type: number
+          - name: freq_z1_days
+            description: "Frequency of Z1 absences"
+            data_type: number
+          - name: freq_z2_days
+            description: "Frequency of Z2 absences"
+            data_type: number
+          - name: freq_z3_daqs
+            description: "Frequency of Z3 absences (note: typo in column name)"
+            data_type: number
+          - name: freq_p0_days
+            description: "Frequency of P0 absences"
+            data_type: number
+          - name: freq_p1_days
+            description: "Frequency of P1 absences"
+            data_type: number
+          - name: freq_p2_days
+            description: "Frequency of P2 absences"
+            data_type: number
+          - name: freq_p3_days
+            description: "Frequency of P3 absences"
+            data_type: number
+          - name: freq_a1_days
+            description: "Frequency of A1 absences"
+            data_type: number
+          - name: freq_a2_days
+            description: "Frequency of A2 absences"
+            data_type: number
+          - name: qty_days_worked
+            description: "Quantity of days worked"
+            data_type: varchar
+          - name: qty_working_days
+            description: "Quantity of working days in the period"
+            data_type: varchar
+
+      - name: postcodes
+        description: "Mapping of postal codes to regions"
+        columns:
+          - name: postcode
+            description: "Postal code"
+            data_type: integer
+            tests:
+              - not_null
+              - unique
+          - name: region_code
+            description: "Region code"
+            data_type: integer
+          - name: region
+            description: "Region name"
+            data_type: string
+
+      - name: absence_type
+        description: "Lookup table for absence type codes and descriptions"
+        columns:
+          - name: type_absence
+            description: "Absence type code"
+            data_type: string
+            tests:
+              - not_null
+              - unique
+          - name: type_absence_fr
+            description: "Absence type description in French"
+            data_type: string
+            tests:
+              - not_null

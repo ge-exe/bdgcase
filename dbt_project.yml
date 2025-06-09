@@ -1,7 +1,7 @@
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
-name: "my_new_project"
+name: "BDG_HR_ANALYTICS"
 version: "1.0.0"
 config-version: 2
 dbt-cloud:
@@ -36,7 +36,16 @@ clean-targets: # directories to be removed by `dbt clean`
 # using the `{{ config(...) }}` macro.
 
 models:
-  my_new_project:
-    # Applies to all files under models/example/
-    example:
+  BDG_HR_ANALYTICS:
+    staging:
+      +materialized: view
+    marts:
       +materialized: table
+
+seeds:
+  BDG_HR_ANALYTICS:
+    Absence_Type:
+      +column_types:
+        type_absence: varchar(10)
+        type_absence_fr: varchar(100)
+      +delimiter: ";"

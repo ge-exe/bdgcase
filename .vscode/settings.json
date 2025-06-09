@@ -1,3 +1,5 @@
 {
-    "dbt.dbtIntegration": "cloud"
+    "dbt.dbtIntegration": "cloud",
+    "dbt.enableNewLineagePanel": true,
+    "sqlfluff.executablePath": "C:\\Users\\GeorgiyEfimov\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\sqlfluff.EXE"
 }

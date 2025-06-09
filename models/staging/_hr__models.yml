@@ -1,0 +1,165 @@
+version: 2
+
+models:
+  # STAGING MODELS
+  - name: stg_hr__absences
+    description: "Staging model for absence data with FDCP key construction and relevant absence types"
+    columns:
+      - name: fdcp
+        description: "Constructed unique identifier: Firm|Department|Category|Person"
+        tests:
+          - not_null
+      - name: firm_id
+        description: "Firm identifier"
+        tests:
+          - not_null
+      - name: department_id
+        description: "Department identifier"
+        tests:
+          - not_null
+      - name: category_id
+        description: "Category identifier"
+        tests:
+          - not_null
+      - name: person_id
+        description: "Person identifier"
+        tests:
+          - not_null
+      - name: period_date
+        description: "Period date for the absence record"
+        tests:
+          - not_null
+      - name: period_month
+        description: "Month truncated period date"
+        tests:
+          - not_null
+      - name: qty_a1_days
+        description: "Work Accident - 1st month absence days"
+      - name: qty_a2_days
+        description: "Work Accident - After 1st month absence days"
+      - name: qty_p1_days
+        description: "Accident - 1st month absence days"
+      - name: qty_p2_days
+        description: "Accident - 2nd-12th month absence days"
+      - name: qty_p3_days
+        description: "Accident - After 1 year absence days"
+      - name: qty_z1_days
+        description: "Illness - 1st month absence days"
+      - name: qty_z2_days
+        description: "Illness - 2nd-12th month absence days"
+      - name: qty_z3_days
+        description: "Illness - After 1 year absence days"
+      - name: qty_days_worked
+        description: "Number of days worked in the period"
+      - name: qty_working_days
+        description: "Total working days available in the period"
+
+  - name: stg_hr__contract_basis
+    description: "Staging model for contract basic information with FDCP key and parsed dates"
+    columns:
+      - name: fdcp
+        description: "Constructed unique identifier: Firm|Department|Category|Person"
+        tests:
+          - not_null
+          - unique
+      - name: firm_id
+        description: "Firm identifier"
+        tests:
+          - not_null
+      - name: department_id
+        description: "Department identifier"
+        tests:
+          - not_null
+      - name: category_id
+        description: "Category identifier"
+        tests:
+          - not_null
+      - name: person_id
+        description: "Person identifier"
+        tests:
+          - not_null
+      - name: contract_start_date
+        description: "Original contract start date (string format)"
+      - name: contract_end_date
+        description: "Original contract end date (string format)"
+      - name: company_start_date
+        description: "Original company start date (string format)"
+      - name: birth_date
+        description: "Original birth date (string format)"
+      - name: contract_start_date_parsed
+        description: "Parsed contract start date"
+        tests:
+          - not_null
+      - name: contract_end_date_parsed
+        description: "Parsed contract end date"
+      - name: company_start_date_parsed
+        description: "Parsed company start date"
+      - name: birth_date_parsed
+        description: "Parsed birth date"
+      - name: gender
+        description: "Employee gender"
+      - name: nationality
+        description: "Employee nationality"
+      - name: contract_type
+        description: "Type of employment contract"
+      - name: contract_zip_code
+        description: "ZIP code of contract location"
+
+  - name: stg_hr__postcodes
+    description: "Staging model for postcode to region mapping"
+    columns:
+      - name: postcode
+        description: "Postal code"
+        tests:
+          - not_null
+          - unique
+      - name: region_code
+        description: "Numeric region code"
+      - name: region
+        description: "Region name"
+        tests:
+          - not_null
+
+  - name: stg_hr__salary_statement
+    description: "Staging model for monthly salary statements with parsed dates and amounts"
+    columns:
+      - name: fdcp
+        description: "Constructed unique identifier: Firm|Department|Category|Person"
+        tests:
+          - not_null
+      - name: period_date
+        description: "Salary period date"
+        tests:
+          - not_null
+      - name: period_month
+        description: "Month truncated period date"
+        tests:
+          - not_null
+      - name: gross_salary
+        description: "Gross salary amount"
+      - name: net_salary
+        description: "Net salary amount (parsed from string)"
+      - name: gross_salary_108
+        description: "Gross salary with 108% calculation (parsed from string)"
+
+  - name: stg_hr__work_plan
+    description: "Staging model for work plan information with parsed dates"
+    columns:
+      - name: fdcp
+        description: "Constructed unique identifier: Firm|Department|Category|Person"
+        tests:
+          - not_null
+      - name: valid_from
+        description: "Work plan validity start date"
+        tests:
+          - not_null
+      - name: valid_to
+        description: "Work plan validity end date"
+        tests:
+          - not_null
+      - name: working_days_per_week
+        description: "Number of working days per week"
+      - name: nace_code
+        description: "NACE economic activity code"
+      - name: nace_description
+        description: "NACE economic activity description"
