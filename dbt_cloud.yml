@@ -1,0 +1,14 @@
+version: "1"
+context:
+  active-host: "cw509.us1.dbt.com"
+  active-project: "70471823476443"
+projects:
+  - project-name: "BDG_HR_ANALYTICS"
+    project-id: "70471823476443"
+    account-name: "Data Trust Asscociates"
+    account-id: "70471823467463"
+    account-host: "cw509.us1.dbt.com"
+    token-name: "cloud-cli-0bf1"
+    token-value: "dbtu_eBfX38YDtoT27Sh1otaSiBDB3ETBSNN1bHaaEf9Gc-a-ehDVOQ"
+
+
