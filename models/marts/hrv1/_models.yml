@@ -1,0 +1,182 @@
+version: 2
+
+models:
+  # MARTS MODELS
+  - name: dim_hr__employee
+    description: "Employee dimension with demographics, contract details, and location"
+    columns:
+      - name: employee_key
+        description: "Primary key - FDCP identifier"
+        tests:
+          - not_null
+          - unique
+      - name: current_age
+        description: "Current age in years"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 16
+              max_value: 80
+              config:
+                severity: warn
+      - name: seniority_years
+        description: "Years of service"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 50
+              config:
+                severity: warn
+      - name: region
+        description: "Employee region"
+        tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: gender
+        description: "Employee gender"
+        tests:
+          - accepted_values:
+              values: ['M', 'F', 'MALE', 'FEMALE']
+              config:
+                severity: warn
+
+  - name: dim_hr__date
+    description: "Date dimension for time-based analysis"
+    columns:
+      - name: date_key
+        description: "Primary key - date"
+        tests:
+          - not_null
+          - unique
+      - name: year
+        description: "Year"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 2016
+              max_value: 2019
+      - name: month_number
+        description: "Month number"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 12
+
+  - name: fct_hr__monthly_employee_metrics
+    description: "Monthly fact table with employee metrics, salary, and absence data"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - date_key
+            - employee_key
+          config:
+            severity: error
+    columns:
+      - name: fact_key
+        description: "Primary key for fact table"
+        tests:
+          - not_null
+          - unique
+      - name: date_key
+        description: "Foreign key to dim_date"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_he__date')
+              field: date_key
+              config:
+                severity: warn
+      - name: employee_key
+        description: "Foreign key to dim_employee"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_he__employee')
+              field: employee_key
+              config:
+                severity: warn
+      - name: gross_salary
+        description: "Monthly gross salary"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 50000
+              config:
+                severity: warn
+      - name: absence_rate_percentage
+        description: "Absence rate as percentage"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              config:
+                severity: warn
+      - name: headcount
+        description: "Headcount flag (should always be 1)"
+        tests:
+          - accepted_values:
+              values: [1]
+      - name: total_absence_days
+        description: "Total absence days"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 31
+              config:
+                severity: warn
+
+  - name: fct_hr__absence_details
+    description: "Detailed absence fact table by absence type"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - date_key
+            - employee_key
+            - absence_type_code
+          config:
+            severity: error
+    columns:
+      - name: absence_fact_key
+        description: "Primary key for absence fact table"
+        tests:
+          - not_null
+          - unique
+      - name: date_key
+        description: "Foreign key to dim_date"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_hr__date')
+              field: date_key
+              config:
+                severity: warn
+      - name: employee_key
+        description: "Foreign key to dim_hr__employee"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_hr__employee')
+              field: employee_key
+              config:
+                severity: warn
+      - name: absence_type_code
+        description: "Absence type code"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['A1', 'A2', 'P1', 'P2', 'P3', 'Z1', 'Z2', 'Z3']
+      - name: absence_days
+        description: "Number of absence days"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 31
+              config:
+                severity: warn
+      - name: absence_frequency
+        description: "Absence frequency"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 10
+              config:
+                severity: warn

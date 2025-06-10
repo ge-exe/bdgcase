@@ -1,0 +1,459 @@
+version: 2
+
+models:
+  # DIMENSION MODELS
+  - name: dim_hr2__absence_type
+    description: "Dimension table for absence types with categorization and descriptions"
+    columns:
+      - name: absence_code
+        description: "Primary key - absence type code (A1, A2, P1, P2, P3, Z1, Z2, Z3)"
+        tests:
+          - not_null
+          - unique
+      - name: absence_description
+        description: "French description of the absence type"
+        tests:
+          - not_null
+      - name: absence_category
+        description: "High-level category: Work Accident, Accident, Illness, Other"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Work Accident', 'Accident', 'Illness', 'Other']
+      - name: absence_period_type
+        description: "Time period classification: 1st month, 2nd-12th month, After 1st year, After 1st month, Other"
+        tests:
+          - not_null
+      - name: absence_sort_order
+        description: "Sorting order for analysis (1=Work Accident, 2=Personal Accident, 3=Illness, 4=Other)"
+        tests:
+          - not_null
+      - name: is_work_accident
+        description: "Flag indicating if this is a work accident type (1=Yes, 0=No)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: is_personal_accident
+        description: "Flag indicating if this is a personal accident type (1=Yes, 0=No)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: is_illness
+        description: "Flag indicating if this is an illness type (1=Yes, 0=No)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: is_first_month
+        description: "Flag indicating if this is a first month absence type (1=Yes, 0=No)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+
+  - name: dim_hr2__date
+    description: "Date dimension table providing calendar hierarchy and date attributes"
+    columns:
+      - name: date_id
+        description: "Primary key - date in YYYYMMDD integer format"
+        tests:
+          - not_null
+          - unique
+      - name: date_day
+        description: "Actual date value"
+        tests:
+          - not_null
+          - unique
+      - name: year
+        description: "Year (YYYY)"
+        tests:
+          - not_null
+      - name: month
+        description: "Month number (1-12)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+      - name: quarter
+        description: "Quarter number (1-4)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4]
+      - name: day_of_month
+        description: "Day of month (1-31)"
+        tests:
+          - not_null
+      - name: day_of_week
+        description: "Day of week (1=Sunday, 7=Saturday)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6, 7]
+      - name: month_start
+        description: "First day of the month for this date"
+        tests:
+          - not_null
+      - name: month_id
+        description: "Month identifier in YYYYMM integer format"
+        tests:
+          - not_null
+      - name: is_weekend
+        description: "Flag indicating if date falls on weekend"
+        tests:
+          - not_null
+      - name: is_current_month
+        description: "Flag indicating if date is in current month"
+        tests:
+          - not_null
+
+  - name: dim_hr2__employee
+    description: "Employee dimension with demographic and contract information"
+    columns:
+      - name: fdcp
+        description: "Primary key - unique identifier: Firm|Department|Category|Person"
+        tests:
+          - not_null
+          - unique
+      - name: firm_id
+        description: "Firm identifier"
+        tests:
+          - not_null
+      - name: department_id
+        description: "Department identifier"
+        tests:
+          - not_null
+      - name: category_id
+        description: "Category identifier"
+        tests:
+          - not_null
+      - name: person_id
+        description: "Person identifier"
+        tests:
+          - not_null
+      - name: contract_start_date
+        description: "Contract start date"
+        tests:
+          - not_null
+      - name: contract_end_date
+        description: "Contract end date (NULL for permanent contracts)"
+      - name: birth_date
+        description: "Employee birth date"
+      - name: gender
+        description: "Employee gender"
+        tests:
+          - accepted_values:
+              values: ['M', 'F', 'MALE', 'FEMALE']
+      - name: nationality
+        description: "Employee nationality"
+      - name: contract_type
+        description: "Type of employment contract"
+      - name: current_age
+        description: "Current age in years"
+        tests:
+          - not_null
+      - name: seniority_years
+        description: "Years of seniority in company"
+        tests:
+          - not_null
+      - name: region
+        description: "Region based on contract zip code"
+        tests:
+          - accepted_values:
+              values: ['Flamande', 'Bruxelles-Capitale', 'Wallonne']
+      - name: age_group
+        description: "Age group classification for analysis"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['<20', '20-25', '25-30', '30-40', '40-50', '50+']
+      - name: seniority_group
+        description: "Seniority group classification"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['<1 year', '1-3 years', '3-5 years', '5-10 years', '10+ years']
+      - name: contract_status
+        description: "Current contract status"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Permanent', 'Active Fixed-term', 'Expired']
+
+  - name: dim_hr2__region
+    description: "Region dimension with postal code mapping"
+    columns:
+      - name: region_code
+        description: "Numeric region code"
+      - name: region
+        description: "Region name"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Flamande', 'Bruxelles-Capitale', 'Wallonne']
+      - name: postcode
+        description: "Postal code"
+        tests:
+          - not_null
+          - unique
+
+  # FACT MODELS
+  - name: fact_hr2__absences
+    description: "Fact table for employee absences with all absence types unpivoted"
+    columns:
+      - name: fdcp
+        description: "Employee identifier"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_hr2__employee')
+              field: fdcp
+      - name: absence_date
+        description: "Date of the absence record"
+        tests:
+          - not_null
+      - name: absence_type
+        description: "Type of absence (A1, A2, P1, P2, P3, Z1, Z2, Z3)"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_hr2__absence_type')
+              field: absence_code
+      - name: absence_days
+        description: "Number of absence days"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: absence_frequency
+        description: "Frequency of absence incidents"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: absence_rate_percent
+        description: "Absence rate as percentage of working days"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              inclusive: true
+      - name: qty_days_worked
+        description: "Number of days worked in the period"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: qty_working_days
+        description: "Total working days available in the period"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: year
+        description: "Year of absence"
+        tests:
+          - not_null
+      - name: month
+        description: "Month of absence"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+  - name: fact_hr2__contract_monthly
+    description: "Monthly fact table for contract status, headcount, and salary costs"
+    columns:
+      - name: month_id
+        description: "Month identifier in YYYYMM format"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_hr2__date')
+              field: month_id
+      - name: fdcp
+        description: "Employee identifier"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_hr2__employee')
+              field: fdcp
+      - name: month_date
+        description: "First day of the month"
+        tests:
+          - not_null
+      - name: headcount
+        description: "Active contract indicator (1=active, 0=inactive)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: is_new_hire
+        description: "New hire indicator (1=started this month, 0=no)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: is_exit
+        description: "Exit indicator (1=ended this month, 0=no)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: monthly_gross_salary
+        description: "Monthly gross salary amount"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: monthly_net_salary
+        description: "Monthly net salary amount"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: seniority_at_month
+        description: "Employee seniority in years at this specific month"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - fdcp
+            - month_date
+          config:
+            severity: error
+
+  - name: fact_hr2__salary_payments
+    description: "Detailed salary payment records with calculated metrics"
+    columns:
+      - name: fdcp
+        description: "Employee identifier"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_hr2__employee')
+              field: fdcp
+      - name: period_date
+        description: "Salary period date"
+        tests:
+          - not_null
+      - name: gross_salary
+        description: "Gross salary amount"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: net_salary
+        description: "Net salary amount"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: net_to_gross_percentage
+        description: "Net to gross salary percentage"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              inclusive: true
+      - name: salary_category
+        description: "Salary range category"
+        tests:
+          - accepted_values:
+              values: ['High', 'Medium-High', 'Medium', 'Low-Medium', 'Low', 'No Salary']
+
+  # MART MODELS (Analysis Views)
+  - name: mart_hr2__absence_analysis
+    description: "Aggregated absence analysis by month and dimensions"
+    columns:
+      - name: absence_month
+        description: "Month of absence analysis"
+        tests:
+          - not_null
+      - name: absence_type
+        description: "Type of absence being analyzed"
+        tests:
+          - not_null
+      - name: employees_with_absences
+        description: "Count of distinct employees with absences"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: total_absence_days
+        description: "Sum of all absence days"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: total_absence_incidents
+        description: "Sum of all absence incidents"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: avg_absence_rate
+        description: "Average absence rate percentage"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+              inclusive: true
+
+  - name: mart_hr2__headcount_evolution
+    description: "Monthly headcount evolution with salary costs by dimensions"
+    columns:
+      - name: month_date
+        description: "Month of analysis"
+        tests:
+          - not_null
+      - name: total_headcount
+        description: "Total active employees"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: new_hires
+        description: "Number of new hires in the month"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: exits
+        description: "Number of exits in the month"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: net_movement
+        description: "Net change in headcount (new_hires - exits)"
+        tests:
+          - not_null
+      - name: total_gross_salary_cost
+        description: "Total gross salary cost for active employees"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true
+      - name: total_net_salary_cost
+        description: "Total net salary cost for active employees"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: true

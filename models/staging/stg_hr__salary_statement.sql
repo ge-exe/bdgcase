@@ -76,7 +76,7 @@ final as (
         period_date,
     
         
-        -- Salary amounts
+        -- Salary amounts, A gross salary of 108 is likely a monthly gross salary expressed in a local currency, such as euros (€) or dollars ($)
         gross_salary_raw as gross_salary,
         net_salary_raw as net_salary,
         gross_salary_108_raw as gross_salary_108,
