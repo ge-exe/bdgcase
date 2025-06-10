@@ -58,7 +58,24 @@ sources:
           - name: contract_type
             description: "Type of contract"
             data_type: string
-
+        tests:
+          - dbt_utils.unique_combination_of_columns:
+              combination_of_columns:
+                - firm_id
+                - department_id  
+                - category_id
+                - person_id
+                - contract_start_date
+                - contract_end_date
+                - company_start_date
+                - birth_date
+                - contract_termination_reason
+                - gender
+                - nationality
+                - contract_type
+              config:
+                severity: error
+                error_if: ">= 1"
       - name: work_plan
         description: "Working time plan details for each contract"
         columns:
@@ -148,7 +165,7 @@ sources:
             data_type: date
           - name: period
             description: "Period of the absence record"
-            data_type: date
+            data_type: string
             tests:
               - not_null
           - name: qty_illness_days
@@ -220,6 +237,20 @@ sources:
           - name: qty_working_days
             description: "Quantity of working days in the period"
             data_type: varchar
+        tests:
+          - dbt_utils.unique_combination_of_columns:
+              combination_of_columns:
+                - firm_id
+                - department_id
+                - category_id
+                - person_id
+                - year
+                - quarter
+                - month
+                - date 
+                - period
+              config:
+                severity: warn
 
       - name: postcodes
         description: "Mapping of postal codes to regions"
@@ -236,7 +267,14 @@ sources:
           - name: region
             description: "Region name"
             data_type: string
-
+        tests:
+          - dbt_utils.unique_combination_of_columns:
+              combination_of_columns:
+                - postcode
+                - region_code
+                - region
+              config:
+                severity: warn
       - name: absence_type
         description: "Lookup table for absence type codes and descriptions"
         columns:
@@ -247,7 +285,7 @@ sources:
               - not_null
               - unique
           - name: type_absence_fr
-            description: "Absence type description in French"
+            description: "Absence type frequency"
             data_type: string
             tests:
               - not_null

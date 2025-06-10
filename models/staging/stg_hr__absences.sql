@@ -2,22 +2,22 @@
 
 SELECT
     -- Construct FDCP
-    LPAD(firm_id::STRING, 10, '0') || '|' ||
+    firm_id::int || '|' ||
     LPAD(department_id::STRING, 2, '0') || '|' ||
     category_id::STRING || '|' ||
-    LPAD(person_id::STRING, 10, '0') AS fdcp,
+    person_id::int AS fdcp,
    
-    firm_id,
+    firm_id::int as firm_id,
     department_id,
     category_id,
-    person_id,
+    person_id::int as person_id,
     year,
     quarter,
     month,
     
-    -- Period is already a DATE type, no conversion needed
-    period AS period_date,
-    DATE_TRUNC('MONTH', period) AS period_month,
+    -- date is already a DATE YYYY/MM/DD, conversion in powerbi, -removed peroiod cause it was just a duplicate column in the data
+    
+    date as dateperiod,
    
     -- Absence quantities (only relevant types)
     qty_a1_days,
@@ -37,7 +37,7 @@ SELECT
     freq_p3_days,
     freq_z1_days,
     freq_z2_days,
-    freq_z3_daqs, -- Note: this has a typo in the source table
+    freq_z3_daqs as freq_z3_days, -- Note: this has a typo in the source table
    
     -- Convert string fields to proper numeric types
     TRY_TO_NUMBER(qty_days_worked) AS qty_days_worked,
